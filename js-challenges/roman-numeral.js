@@ -1,82 +1,51 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 class RomanNumeral {
-  static numerals = {
-    1: "I",
-    5: "V",
-    10: "X",
-    50: "L",
-    100: "C",
-    500: "D",
-    1000: "M"
+  static NUMERALS = {
+    1: {roman: "I", subtract: 0},
+    5: {roman: "V", subtract: 1},
+    10: {roman: "X", subtract: 1},
+    50: {roman: "L", subtract: 10},
+    100: {roman: "C", subtract: 10},
+    500: {roman: "D", subtract: 100},
+    1000: {roman: "M", subtract: 100},
   }
+
   constructor(arabicNumeral) {
     this.arabicNumeral = arabicNumeral;
   }
+
   toRoman() {
-    let roman = '';
+    let builtRoman = '';
     let num = this.arabicNumeral;
     while (num > 0) {
-      if (num >= 900) {
-        if (num < 1000) {
-          roman += RomanNumeral.numerals[100];
-          roman += RomanNumeral.numerals[1000];
-          num -= 900;
-        } else {
-          roman += RomanNumeral.numerals[1000];
-          num -= 1000;
+      for (let arabic of RomanNumeral.descendingArabicNumerals()) {
+        let roman = this.toBaseRoman(arabic);
+        let arabicToSubtract = this.arabicToSubtract(arabic);
+        while (num >= arabic) {
+          builtRoman += roman;
+          num -= arabic;
         }
-      } else if (num >= 400) {
-        if (num < 500) {
-          roman += RomanNumeral.numerals[100];
-          roman += RomanNumeral.numerals[500];
-          num -= 400;
-        } else {
-          roman += RomanNumeral.numerals[500];
-          num -= 500;
+        if (num >= arabic - arabicToSubtract) {
+          builtRoman += this.toBaseRoman(arabicToSubtract);
+          builtRoman += roman;
+          num -= (arabic - arabicToSubtract);
         }
-      } else if (num >= 90) {
-        if (num < 100) {
-          roman += RomanNumeral.numerals[10];
-          roman += RomanNumeral.numerals[100];
-          num -= 90;
-        } else {
-          roman += RomanNumeral.numerals[100];
-          num -= 100;
-        }
-      } else if (num >= 40) {
-        if (num < 50) {
-          roman += RomanNumeral.numerals[10];
-          roman += RomanNumeral.numerals[50];
-          num -= 40;
-        } else {
-          roman += RomanNumeral.numerals[50];
-          num -= 50;
-        }
-      } else if (num >= 9) {
-        if (num < 10) {
-          roman += RomanNumeral.numerals[1];
-          roman += RomanNumeral.numerals[10];
-          num -= 9;
-        } else {
-          roman += RomanNumeral.numerals[10];
-          num -= 10;
-        }
-      } else if (num >= 4) {
-        if (num < 5) {
-          roman += RomanNumeral.numerals[1];
-          roman += RomanNumeral.numerals[5];
-          num -= 4;
-        } else {
-          roman += RomanNumeral.numerals[5];
-          num -= 5;
-        }
-      } else {
-        roman += RomanNumeral.numerals[1].repeat(num);
-        num = 0;
       }
     }
-    return roman;
+    return builtRoman;
+  }
+
+  static descendingArabicNumerals() {
+    return Object.keys(RomanNumeral.NUMERALS).reverse();
+  }
+
+  toBaseRoman(arabic) {
+    return RomanNumeral.NUMERALS[arabic].roman;
+  }
+
+  arabicToSubtract(arabic) {
+    return RomanNumeral.NUMERALS[arabic].subtract;
   }
 }
 
